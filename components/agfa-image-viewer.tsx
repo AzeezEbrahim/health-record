@@ -306,7 +306,7 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
                 className="h-7 px-2 text-xs whitespace-nowrap"
                 title={`SerNr: ${s.id} - ${s.title} (${s.imageCount} images)`}
               >
-                SerNr: {s.id}
+                {s.title}
               </Button>
             ))}
           </div>
@@ -356,7 +356,7 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
         {/* Image Info Overlay */}
         {currentSeriesData && !isLoading && (
           <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-2 rounded text-sm">
-            <div>SerNr: {currentSeriesData.id} {currentSeriesData.title}</div>
+            <div>{currentSeriesData.title}</div>
             <div>Image {currentImage + 1} of {currentSeriesData.images.length}</div>
             <div className="text-xs text-gray-300">Total: {currentSeriesData.imageCount} images</div>
             {zoom !== 1 && <div>Zoom: {Math.round(zoom * 100)}%</div>}
