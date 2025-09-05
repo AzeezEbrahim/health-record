@@ -60,99 +60,360 @@ export function LabResultsViewer({
     new Date(b).getTime() - new Date(a).getTime()
   )
 
-  // Sample lab results for demonstration
+  // Actual lab results from patient data - Multiple dates
   const sampleResults: LabResult[] = [
+    // Results from 30/04/2025 (April 30, 2025) - WORST cholesterol results
+    {
+      id: "lab_001_april",
+      date: "30/04/2025",
+      testName: "CHOLESTEROL-TOTAL",
+      value: "4.62",
+      unit: "mmol/L",
+      referenceRange: "2.7 - 5.2",
+      status: "normal"
+    },
+    {
+      id: "lab_002_april", 
+      date: "30/04/2025",
+      testName: "TRIGLYCERIDES",
+      value: "1.35",
+      unit: "mmol/L",
+      referenceRange: "1 - 1.69",
+      status: "normal"
+    },
+    {
+      id: "lab_003_april",
+      date: "30/04/2025", 
+      testName: "HDL-CHOLESTEROL",
+      value: "1.00",
+      unit: "mmol/L",
+      referenceRange: "1.55 - 2",
+      status: "abnormal",
+      notes: "Below normal range"
+    },
+    {
+      id: "lab_004_april",
+      date: "30/04/2025",
+      testName: "LDL-CHOLESTEROL",
+      value: "3.00",
+      unit: "mmol/L",
+      referenceRange: "1 - 2.6",
+      status: "abnormal",
+      notes: "Above normal range - WORST"
+    },
+    // Results from 18/07/2025 (July 18, 2025) - Better results
+    {
+      id: "lab_005_july",
+      date: "18/07/2025",
+      testName: "CHOLESTEROL-TOTAL",
+      value: "3.96",
+      unit: "mmol/L",
+      referenceRange: "2.7 - 5.2",
+      status: "normal"
+    },
+    {
+      id: "lab_006_july", 
+      date: "18/07/2025",
+      testName: "TRIGLYCERIDES",
+      value: "0.77",
+      unit: "mmol/L",
+      referenceRange: "1 - 1.69",
+      status: "abnormal",
+      notes: "Below normal range"
+    },
+    {
+      id: "lab_007_july",
+      date: "18/07/2025", 
+      testName: "HDL-CHOLESTEROL",
+      value: "1.34",
+      unit: "mmol/L",
+      referenceRange: "1.55 - 2",
+      status: "abnormal",
+      notes: "Below normal range"
+    },
+    {
+      id: "lab_008_july",
+      date: "18/07/2025",
+      testName: "LDL-CHOLESTEROL",
+      value: "2.27",
+      unit: "mmol/L",
+      referenceRange: "1 - 2.6",
+      status: "normal"
+    },
+    // Results from 29/08/2025 (August 29, 2025)
+    // Lipid Panel
     {
       id: "lab_001",
-      date: "15/08/2025",
-      testName: "Total Cholesterol (Lipid Panel)",
-      value: "220",
-      unit: "mg/dL",
-      referenceRange: "< 200",
+      date: "29/08/2025",
+      testName: "CHOLESTEROL-TOTAL",
+      value: "2.61",
+      unit: "mmol/L",
+      referenceRange: "2.7 - 5.2",
       status: "abnormal",
-      notes: "Slightly elevated, recommend dietary changes"
+      notes: "Below normal range"
     },
     {
       id: "lab_002", 
-      date: "14/08/2025",
-      testName: "HDL Cholesterol (Good Cholesterol)",
-      value: "45",
-      unit: "mg/dL",
-      referenceRange: "> 40",
+      date: "29/08/2025",
+      testName: "TRIGLYCERIDES",
+      value: "1.17",
+      unit: "mmol/L",
+      referenceRange: "1 - 1.69",
       status: "normal"
     },
     {
       id: "lab_003",
-      date: "14/08/2025", 
-      testName: "LDL Cholesterol (Bad Cholesterol)",
-      value: "150",
-      unit: "mg/dL",
-      referenceRange: "< 100",
+      date: "29/08/2025", 
+      testName: "HDL-CHOLESTEROL",
+      value: "0.88",
+      unit: "mmol/L",
+      referenceRange: "1.55 - 2",
       status: "abnormal",
-      notes: "Elevated, consider medication"
+      notes: "Below normal range"
     },
     {
       id: "lab_004",
-      date: "13/08/2025",
-      testName: "Triglycerides (Blood Fats)",
-      value: "180",
-      unit: "mg/dL",
-      referenceRange: "< 150",
-      status: "abnormal",
-      notes: "Mildly elevated"
-    },
-    {
-      id: "lab_005",
-      date: "13/08/2025",
-      testName: "Fasting Blood Glucose",
-      value: "95",
-      unit: "mg/dL",
-      referenceRange: "70-100",
+      date: "29/08/2025",
+      testName: "LDL-CHOLESTEROL",
+      value: "1.20",
+      unit: "mmol/L",
+      referenceRange: "1 - 2.6",
       status: "normal"
     },
     {
+      id: "lab_005",
+      date: "29/08/2025",
+      testName: "GLYCATED HB1",
+      value: "5.7",
+      unit: "%",
+      referenceRange: "4 - 5.7",
+      status: "normal"
+    },
+    // Kidney Function
+    {
       id: "lab_006",
-      date: "12/08/2025",
-      testName: "Serum Creatinine (Kidney Function)",
-      value: "1.1",
-      unit: "mg/dL",
-      referenceRange: "0.8-1.3",
+      date: "29/08/2025",
+      testName: "CREATININE",
+      value: "68.7",
+      unit: "µmol/L",
+      referenceRange: "50 - 110",
       status: "normal"
     },
     {
       id: "lab_007",
-      date: "12/08/2025",
-      testName: "Blood Urea Nitrogen (BUN)",
-      value: "18",
-      unit: "mg/dL",
-      referenceRange: "7-25",
+      date: "29/08/2025",
+      testName: "BUN",
+      value: "4.2",
+      unit: "mmol/L",
+      referenceRange: "3.14 - 7.14",
       status: "normal"
     },
+    // Thyroid Function
     {
       id: "lab_008",
-      date: "11/08/2025",
-      testName: "Hemoglobin (Oxygen Carrier)",
-      value: "14.5",
-      unit: "g/dL",
-      referenceRange: "13.5-16.5",
-      status: "normal"
+      date: "29/08/2025",
+      testName: "TSH ARCHI 4",
+      value: "1.25",
+      unit: "mIU/L",
+      referenceRange: "3 - 4.5",
+      status: "abnormal",
+      notes: "Below normal range"
     },
+    // Cardiac Enzymes
     {
       id: "lab_009",
-      date: "11/08/2025",
-      testName: "White Blood Cell Count (Immune System)",
-      value: "7500",
-      unit: "/µL",
-      referenceRange: "4500-11000",
+      date: "29/08/2025",
+      testName: "CK VITROS1",
+      value: "83",
+      unit: "U/L",
+      referenceRange: "55 - 170",
+      status: "normal"
+    },
+    // Electrolytes
+    {
+      id: "lab_010",
+      date: "29/08/2025",
+      testName: "SODIUM1",
+      value: "143",
+      unit: "mmol/L",
+      referenceRange: "136 - 145",
       status: "normal"
     },
     {
-      id: "lab_010",
-      date: "10/08/2025",
-      testName: "Platelet Count (Blood Clotting)",
-      value: "250000",
-      unit: "/µL",
-      referenceRange: "150000-450000",
+      id: "lab_011",
+      date: "29/08/2025",
+      testName: "POTASSIUM1",
+      value: "3.8",
+      unit: "mmol/L",
+      referenceRange: "3.5 - 5.1",
+      status: "normal"
+    },
+    // Complete Blood Count
+    {
+      id: "lab_012",
+      date: "29/08/2025",
+      testName: "WBC CBC2",
+      value: "6.60",
+      unit: "×10³/µL",
+      referenceRange: "4.5 - 11",
+      status: "normal"
+    },
+    {
+      id: "lab_013",
+      date: "29/08/2025",
+      testName: "RBC CBC2",
+      value: "4.42",
+      unit: "×10⁶/µL",
+      referenceRange: "4.5 - 5.9",
+      status: "abnormal",
+      notes: "Slightly below normal"
+    },
+    {
+      id: "lab_014",
+      date: "29/08/2025",
+      testName: "HB CBC2",
+      value: "13.4",
+      unit: "g/dL",
+      referenceRange: "13.5 - 17.5",
+      status: "abnormal",
+      notes: "Slightly below normal"
+    },
+    {
+      id: "lab_015",
+      date: "29/08/2025",
+      testName: "PCV CBC2",
+      value: "37.1",
+      unit: "%",
+      referenceRange: "41 - 53",
+      status: "abnormal",
+      notes: "Below normal range"
+    },
+    {
+      id: "lab_016",
+      date: "29/08/2025",
+      testName: "MCV CBC2",
+      value: "83.9",
+      unit: "fL",
+      referenceRange: "80 - 100",
+      status: "normal"
+    },
+    {
+      id: "lab_017",
+      date: "29/08/2025",
+      testName: "MCH CBC2",
+      value: "30.3",
+      unit: "pg",
+      referenceRange: "26 - 34",
+      status: "normal"
+    },
+    {
+      id: "lab_018",
+      date: "29/08/2025",
+      testName: "MCHC CBC2",
+      value: "36.1",
+      unit: "g/dL",
+      referenceRange: "31 - 37",
+      status: "normal"
+    },
+    {
+      id: "lab_019",
+      date: "29/08/2025",
+      testName: "PLATELET CBC2",
+      value: "335",
+      unit: "×10³/µL",
+      referenceRange: "130 - 400",
+      status: "normal"
+    },
+    {
+      id: "lab_020",
+      date: "29/08/2025",
+      testName: "NEUTROPHIL SEGMENTED CBCD",
+      value: "49.4",
+      unit: "%",
+      referenceRange: "35 - 65",
+      status: "normal"
+    },
+    {
+      id: "lab_021",
+      date: "29/08/2025",
+      testName: "LYMPHOCYTES",
+      value: "39.7",
+      unit: "%",
+      referenceRange: "20 - 45",
+      status: "normal"
+    },
+    {
+      id: "lab_022",
+      date: "29/08/2025",
+      testName: "MONOCYTES CBCD2",
+      value: "8.3",
+      unit: "%",
+      referenceRange: "3 - 10",
+      status: "normal"
+    },
+    {
+      id: "lab_023",
+      date: "29/08/2025",
+      testName: "EOSINOPHILS CBCD2",
+      value: "2.0",
+      unit: "%",
+      referenceRange: "0 - 6",
+      status: "normal"
+    },
+    {
+      id: "lab_024",
+      date: "29/08/2025",
+      testName: "BASOPHILS CBCD2",
+      value: "0.6",
+      unit: "%",
+      referenceRange: "0 - 2",
+      status: "normal"
+    },
+    {
+      id: "lab_025",
+      date: "29/08/2025",
+      testName: "RDW",
+      value: "12.6",
+      unit: "%",
+      referenceRange: "12.2 - 16.1",
+      status: "normal"
+    },
+    // Coagulation Studies
+    {
+      id: "lab_026",
+      date: "29/08/2025",
+      testName: "PT2",
+      value: "13.0",
+      unit: "sec",
+      referenceRange: "10 - 14",
+      status: "normal"
+    },
+    {
+      id: "lab_027",
+      date: "29/08/2025",
+      testName: "INR2",
+      value: "1.14",
+      unit: "ratio",
+      referenceRange: "1.2 - 8",
+      status: "abnormal",
+      notes: "Slightly below normal"
+    },
+    {
+      id: "lab_028",
+      date: "29/08/2025",
+      testName: "PTT2",
+      value: "30.8",
+      unit: "sec",
+      referenceRange: "26 - 42",
+      status: "normal"
+    },
+    {
+      id: "lab_029",
+      date: "29/08/2025",
+      testName: "D-DIMER2",
+      value: "0.414",
+      unit: "mg/L",
+      referenceRange: "0 - 0.5",
       status: "normal"
     }
   ]
@@ -264,12 +525,6 @@ export function LabResultsViewer({
             {dateIndex < dates.length - 1 && <Separator className="mt-3" />}
           </div>
         ))}
-
-        {isDemo && (
-          <div className="text-center text-muted-foreground py-4">
-            <p className="text-xs">Showing sample lab results for demonstration</p>
-          </div>
-        )}
       </div>
     </div>
   )

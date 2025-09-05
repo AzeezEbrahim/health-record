@@ -129,7 +129,7 @@ export function MedicalDashboardNew({ patient, studies, selectedStudy, onStudySe
               </div>
               
               {/* Lab Results Below */}
-              <div className="h-[78rem] flex-shrink-0">
+              <div className="h-[38rem] flex-shrink-0">
                 <LabResultsViewer labResults={[]} className="h-full" />
               </div>
             </div>
