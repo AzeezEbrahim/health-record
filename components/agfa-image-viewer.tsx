@@ -34,6 +34,10 @@ interface AGFASeries {
   imageCount: number
 }
 
+// Define the default FPS and calculate the default play speed in ms
+const DEFAULT_FPS = 8
+const DEFAULT_PLAY_SPEED = 1000 / DEFAULT_FPS
+
 export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageViewerProps) {
   const [series, setSeries] = useState<AGFASeries[]>([])
   const [currentSeries, setCurrentSeries] = useState(0)
@@ -41,7 +45,7 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
   const [isLoading, setIsLoading] = useState(false)
   const [zoom, setZoom] = useState(1)
   const [isPlaying, setIsPlaying] = useState(false)
-  const [playSpeed, setPlaySpeed] = useState(500) // ms between frames
+  const [playSpeed, setPlaySpeed] = useState(DEFAULT_PLAY_SPEED) // ms between frames, default for 8 fps
   const [error, setError] = useState<string | null>(null)
 
   // Load series data from AGFA parser

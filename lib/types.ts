@@ -125,9 +125,33 @@ export interface MedicalRecord {
 }
 
 // Extended medical data for future use
+// Echocardiography specific types
+export interface EchoMeasurement {
+  parameter: string
+  normalRange: string
+  patientValue: string
+  unit: string
+  status: "normal" | "abnormal" | "not_measured"
+}
+
+export interface EchoReport {
+  id: string
+  date: string
+  patientId: string
+  hospital: string
+  cardiologist: string
+  measurements: EchoMeasurement[]
+  remarks: string[]
+  conclusion: string[]
+  recommendation?: string
+  ejectionFraction?: number
+  lvFunction?: string
+}
+
 export interface ExtendedMedicalData extends MedicalData {
   labResults?: LabResult[]
   vitalSigns?: VitalSigns[]
+  echoReports?: EchoReport[]
   notes?: MedicalRecord[]
   timeline?: MedicalRecord[]
 }

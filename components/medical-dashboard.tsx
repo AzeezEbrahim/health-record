@@ -129,8 +129,8 @@ export function MedicalDashboardNew({ patient, studies, selectedStudy, onStudySe
               </div>
               
               {/* Lab Results Below */}
-              <div className="h-[38rem] flex-shrink-0">
-                <LabResultsViewer labResults={[]} className="h-full" />
+              <div className="h-[58rem] flex-shrink-0">
+                <LabResultsViewer labResults={[]} echoReports={[]} className="h-full" />
               </div>
             </div>
           </TabsContent>
@@ -217,7 +217,7 @@ export function MedicalDashboardNew({ patient, studies, selectedStudy, onStudySe
 
         {/* Labs Tab */}
         <TabsContent value="labs" className="flex-1 mt-0">
-          <LabResultsViewer labResults={[]} className="h-full" />
+          <LabResultsViewer labResults={[]} echoReports={[]} className="h-full" />
         </TabsContent>
       </Tabs>
     </div>

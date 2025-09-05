@@ -14,20 +14,26 @@ import {
   AlertTriangle,
   Plus,
   Download,
-  Heart
+  Heart,
+  Activity
 } from "lucide-react"
-import type { LabResult } from "@/lib/types"
+import type { LabResult, EchoReport } from "@/lib/types"
+import { EchoReportViewer } from "@/components/echo-report-viewer"
 
 interface LabResultsViewerProps {
   labResults: LabResult[]
+  echoReports?: EchoReport[]
   className?: string
   onAddResult?: () => void
+  onAddEchoReport?: () => void
 }
 
 export function LabResultsViewer({ 
   labResults, 
+  echoReports = [],
   className, 
-  onAddResult 
+  onAddResult,
+  onAddEchoReport
 }: LabResultsViewerProps) {
   const [activeTab, setActiveTab] = useState("all")
   const getStatusIcon = (status: LabResult["status"]) => {
@@ -551,7 +557,7 @@ export function LabResultsViewer({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-        <TabsList className="grid grid-cols-2 w-full mb-3 flex-shrink-0">
+        <TabsList className="grid grid-cols-3 w-full mb-3 flex-shrink-0">
           <TabsTrigger value="all" className="flex items-center gap-1">
             <TestTube className="h-3 w-3" />
             All Labs
@@ -566,6 +572,13 @@ export function LabResultsViewer({
               {sampleBPResults.length}
             </Badge>
           </TabsTrigger>
+          <TabsTrigger value="echo" className="flex items-center gap-1">
+            <Activity className="h-3 w-3" />
+            Echo Reports
+            <Badge variant="secondary" className="text-xs ml-1">
+              {echoReports.length || 1}
+            </Badge>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="all" className="flex-1 min-h-0 overflow-hidden">
@@ -574,6 +587,14 @@ export function LabResultsViewer({
 
         <TabsContent value="bp" className="flex-1 min-h-0 overflow-hidden">
           {renderResults(bpResults, bpDates, true)}
+        </TabsContent>
+
+        <TabsContent value="echo" className="flex-1 min-h-0 overflow-hidden">
+          <EchoReportViewer 
+            echoReports={echoReports} 
+            onAddReport={onAddEchoReport}
+            className="h-full border-0 p-0"
+          />
         </TabsContent>
       </Tabs>
     </Card>
