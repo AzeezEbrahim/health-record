@@ -1,0 +1,53 @@
+<html>
+<head>
+    <script type="text/javascript" src="SITE-ASSETS/scripts/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="SITE-ASSETS/scripts/lang.js"></script>
+    <script type="text/javascript">
+        var LANG;
+
+        function pageReady(jQuery) {
+            LANG = navigator.language || navigator.userLanguage;
+            if (isNull(languages[LANG])) {
+                LANG = defaultLanguage;
+                if (isNull(languages[LANG])) {
+                    LANG = "it-IT";
+                }
+            }
+            $('#select-study').html(languages[LANG].select_study);
+            $('#chrome-recommended').html(languages[LANG].chrome_recommended);
+        }
+
+        function isNull(objectToCheck) {
+            return objectToCheck === null || objectToCheck == null || objectToCheck === undefined || objectToCheck == undefined || objectToCheck === "" || objectToCheck == "";
+        }
+
+        $(document).ready(pageReady);
+    </script>
+    <style type="text/css">
+        .auto-style1 {
+            font-size: xx-large;
+            vertical-align: central;
+        }
+
+        .auto-style2 {
+            font-size: medium;
+            vertical-align: central;
+        }
+    </style>
+</head>
+<body>
+    <p  class="auto-style1">
+        <span id="select-study">Selezionare lo studio/serie a sinistra</span>
+    </p>
+    <p class="auto-style1">
+        &nbsp;
+    </p>
+    <p class="auto-style1">
+        &nbsp;
+    </p>
+    <p  class="auto-style2">
+        <span id="chrome-recommended">Si consiglia </span><a href="https://www.google.com/chrome/">Google Chrome</a>
+    </p>
+
+</body>
+</html>

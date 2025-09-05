@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__browsermcp__browser_screenshot",
+      "mcp__browsermcp__browser_navigate",
+      "mcp__browsermcp__browser_snapshot",
+      "mcp__browsermcp__browser_click"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

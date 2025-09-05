@@ -1,0 +1,164 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Agfa HealthCare Patient CD</title>
+
+    <HTA:APPLICATION
+        APPLICATIONNAME="Agfa HealthCare Patient CD"
+        CAPTION="yes"
+        SCROLL="yes"
+        SINGLEINSTANCE="yes"
+        WINDOWSTATE="maximize"
+        ICON="agfa.ico"/> 
+
+    <link rel="stylesheet" type="text/css" href="IHE_PDI/SITE-ASSETS/css/style.css" media="all" />
+
+    <script language="javascript" type="text/javascript" src="IHE_PDI/SITE-ASSETS/scripts/jquery-1.12.4.min.js"></script>
+    <script type="text/javascript" src="IHE_PDI/SITE-ASSETS/scripts/lang.js"></script>
+
+    <script language="javascript" type="text/javascript" src="data.json"></script>
+
+    <script language="javascript" type="text/javascript">
+    
+    var p7mViewerCmd ="REPORTS\\DigitalSignReaderPortable\\DigitalSignCSPReaderPortable.exe";
+	var htmlViewerCmd ="INDEX.HTM";
+
+	var LANG;
+
+    function pageReady(jQuery)
+    {
+        LANG = navigator.language || navigator.userLanguage;
+        if (isNull(languages[LANG])) {
+            LANG = defaultLanguage;
+            if (isNull(languages[LANG])) {
+                LANG = "it-IT";
+            }
+        }
+
+        $('#patient-name-label').html(languages[LANG].patient + ':');
+        $('#patient-dob-label').html(languages[LANG].dob + ':');
+        $('#dicom-button').prop("alt", (languages[LANG].dicom_button));
+        $('#html-button').prop("alt", (languages[LANG].html_button));
+
+        fillPatientData();
+        displayReports();
+        showDisclaimer();
+    }
+
+    function isNull(objectToCheck) {
+        return objectToCheck === null || objectToCheck == null || objectToCheck === undefined || objectToCheck == undefined || objectToCheck === "" || objectToCheck == "";
+    }
+
+    function fillPatientData() {
+        $('#patient-name').html(currentData.data.patient.name);
+        $('#patient-dob').html(currentData.data.patient.date_of_birth);
+    }
+
+    function showDisclaimer() {
+        if (currentData.data.disclaimer.path != '') {
+            window.showModalDialog(currentData.data.disclaimer.path, '', 'dialogwidth:800px');
+        }
+    }
+
+    function openDicom(accessionNumber)
+    {
+        document.body.style.cursor = "wait";
+        var dcmViewerCmd = currentData.data.viewer.path;
+        var oShell = new ActiveXObject("WScript.Shell");
+        oShell.run(dcmViewerCmd);
+        setTimeout(function () { document.body.style.cursor = "default"; }, 5000);
+    }
+    
+    function openHtml(accessionNumber)
+    {
+        document.body.style.cursor = "wait";
+        var oShell = new ActiveXObject("WScript.Shell");
+        oShell.run(htmlViewerCmd);
+        setTimeout(function () { document.body.style.cursor = "default"; }, 5000);
+    }
+    
+    function openP7m(accessionNumber, fileExtension)
+    {
+        document.body.style.cursor = "wait";
+        var oShell = new ActiveXObject("WScript.Shell");
+        oShell.run(p7mViewerCmd + " ./REPORTS/" + accessionNumber + fileExtension);
+        setTimeout(function () { document.body.style.cursor = "default"; }, 5000);
+    }
+
+    function openPdf(accessionNumber) {
+        document.body.style.cursor = "wait";
+        var oShell = new ActiveXObject("WScript.Shell");
+        oShell.run("REPORTS\\" + accessionNumber + ".pdf");
+        setTimeout(function () { document.body.style.cursor = "default"; }, 5000);
+    }
+    
+    function appExit()
+	{
+        self.close();
+    }
+    
+    function displayReports()
+    {
+        var report = currentData.data.reports.report;
+        for(var i in report)
+        {
+            var htmlToAppend = '<div class="report"><span class="data">' ;
+            htmlToAppend = htmlToAppend + report[i].study_date + " - " + report[i].accession_number + " - " + report[i].description ;
+            htmlToAppend = htmlToAppend + '</span><span class="icons">';
+            var apos ="'";
+            if(report[i].p7m_enabled.toLowerCase() == 'true')
+            {
+                htmlToAppend = htmlToAppend + '<span class="button_left"></span><span class="button_center"><img src="IHE_PDI/SITE-ASSETS/images/p7m.png" alt="' + languages[LANG].show_digitally_signed_report + '" onclick="openP7m(' + apos + report[i].accession_number + apos + ',' + apos + report[i].p7m_file_extension + apos +')" /></span><span class="button_right"></span>';
+            }
+            else if (report[i].pdf_enabled.toLowerCase() == 'true') {
+                    htmlToAppend = htmlToAppend + '<span class="button_left"></span><span class="button_center"><img src="IHE_PDI/SITE-ASSETS/images/pdf.png" alt="' + languages[LANG].show_report + '" onclick="openPdf(' + apos + report[i].accession_number + apos + ')" /></span><span class="button_right"></span>';
+                }
+            htmlToAppend = htmlToAppend + '</span></div>';
+            
+            $("#report-list").append(htmlToAppend);
+        }
+    }
+    
+    $(document).ready(pageReady);
+    </script>
+
+</head>
+<body>
+    <div id="main">
+        <div id="header">
+            <a href="http://www.agfahealthcare.com">
+                <div id="logoagfa">
+                </div>
+            </a>
+            <div id="logoazienda">
+                <img src="IHE_PDI/SITE-ASSETS/images/logo.png"/>
+            </div>
+        </div>
+        <div id="patient-data">
+            <div class="label">
+                <span id="patient-name-label" class="label"></span>
+                <span id="patient-name" class="label-text"></span>
+            </div>
+            <div class="label">
+                <span id="patient-dob-label" class="label"></span>
+                <span id="patient-dob" class="label-text"></span>
+            </div>
+            <div style="margin: 5px 50%;">
+                <span class="icons" style="float: none;">
+                    <span class="button_left"></span>
+                    <span class="button_center">
+                        <img id="dicom-button" src="IHE_PDI/SITE-ASSETS/images/dicom.png" alt="Avvia DICOM" onclick="openDicom('')" /></span>
+                    <span class="button_right"></span>
+                    <span class="button_left"></span>
+                    <span class="button_center">
+                        <img id="html-button" src="IHE_PDI/SITE-ASSETS/images/html.png" alt="Avvia HTML (consigliato Chrome)" onclick="openHtml('')" /></span>
+                    <span class="button_right"></span>
+                </span>
+
+            </div>
+        </div>
+        <div id="report-list">
+        </div>
+    </div>
+</body>
+</html>

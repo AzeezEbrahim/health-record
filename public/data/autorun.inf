@@ -1,0 +1,4 @@
+[autorun]
+LABEL=EB
+ICON=agfa.ico
+OPEN=autorun.exe START.hta
