@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { DicomViewer } from "@/components/dicom-viewer"
-import { PDFReportViewer } from "@/components/pdf-report-viewer-new"
+import { PDFReportViewer } from "@/components/pdf-report-viewer"
 import { ImageIcon, FileText, Maximize2, Minimize2 } from "lucide-react"
 import type { Study } from "@/lib/types"
 

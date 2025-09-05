@@ -2,8 +2,9 @@
 
 import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
-import { MedicalDashboardNew } from "@/components/medical-dashboard-new"
-import { ImageIcon, Loader2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { MedicalDashboardNew } from "@/components/medical-dashboard"
+import { ImageIcon, Loader2, ExternalLink } from "lucide-react"
 import type { MedicalData, Study } from "@/lib/types"
 import { loadMedicalData } from "@/lib/data-parser"
 
@@ -15,11 +16,19 @@ export default function MedicalViewer() {
   useEffect(() => {
     const loadData = async () => {
       try {
+        console.log("Starting medical data loading...")
+        const startTime = Date.now()
+        
         const data = await loadMedicalData()
+        
+        const loadTime = Date.now() - startTime
+        console.log(`Medical data loaded in ${loadTime}ms`)
+        
         setMedicalData(data)
         setSelectedStudy(data.studies[0] || null)
       } catch (error) {
         console.error("Failed to load medical data:", error)
+        setMedicalData(null)
       } finally {
         setLoading(false)
       }
@@ -31,9 +40,15 @@ export default function MedicalViewer() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
-          <p className="text-muted-foreground">Loading medical data...</p>
+        <div className="text-center max-w-md">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <h2 className="text-lg font-semibold mb-2">Loading Medical Records</h2>
+          <p className="text-muted-foreground text-sm mb-4">
+            Initializing AGFA medical data viewer...
+          </p>
+          <div className="text-xs text-muted-foreground">
+            This may take a few seconds for large datasets
+          </div>
         </div>
       </div>
     )
@@ -66,6 +81,22 @@ export default function MedicalViewer() {
             </div>
 
             <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                asChild
+                className="flex items-center gap-2 text-xs"
+              >
+                <a
+                  href="https://drive.google.com/file/d/1H7NIJfq5tXrtwuIo9693ZT4KmxY5DW0X/view?usp=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <ExternalLink className="h-3 w-3" />
+                  <span className="hidden sm:inline">Download Advanced AGFA viewer</span>
+                  <span className="sm:hidden">Studies</span>
+                </a>
+              </Button>
               {selectedStudy && (
                 <Badge variant="outline" className="text-xs">
                   {selectedStudy.type}
@@ -73,7 +104,6 @@ export default function MedicalViewer() {
               )}
             </div>
           </div>
-
         </div>
       </header>
 

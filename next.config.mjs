@@ -31,6 +31,12 @@ const nextConfig = {
       type: 'webassembly/async',
     });
     
+    // Add rule for DICOM files to be served as static assets
+    config.module.rules.push({
+      test: /\.dcm$/i,
+      type: 'asset/resource',
+    });
+    
     return config;
   },
   

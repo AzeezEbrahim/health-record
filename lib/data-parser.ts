@@ -10,14 +10,28 @@ export class AGFADataParser {
     }
 
     const studies: Study[] = rawData.data.reports.report.map((report, index) => {
-      // Map DICOM files - using sequential numbering for now
+      // Don't generate DICOM files upfront - use lazy loading instead
+      // Just store minimal info needed for the study browser
       const dicomFiles: string[] = []
-      // For now, assume first few DICOM files belong to first study, etc.
-      // In real implementation, you'd use DICOMDIR or study metadata
-      const startFile = index * 50 + 1 // Rough estimate
-      for (let i = 0; i < Math.min(50, 100); i++) {
+      
+      // Only generate a few sample paths for preview - actual loading happens on demand
+      const sampleCount = Math.min(3, 6957) // Just 3 sample files for fast loading
+      const startFile = (index * 10) + 1 // Spread studies across the file range
+      
+      for (let i = 0; i < sampleCount; i++) {
         const fileNum = (startFile + i).toString().padStart(8, '0')
-        dicomFiles.push(`/data/DICOM/${fileNum}`)
+        dicomFiles.push(`/data/DICOM/${fileNum}/`)
+      }
+
+      // Calculate estimated image count based on modality (for display purposes only)
+      let imageCount = 20
+      const desc = report.description.toUpperCase()
+      if (desc.includes('MRI')) {
+        imageCount = 85 // Average MRI count
+      } else if (desc.includes('CT')) {
+        imageCount = 150 // Average CT count
+      } else if (desc.includes('ULTRASOUND')) {
+        imageCount = 12 // Average Ultrasound count
       }
 
       return {
@@ -26,10 +40,10 @@ export class AGFADataParser {
         description: report.description,
         type: this.mapModalityToType(report.description),
         modality: this.extractModality(report.description),
-        dicomFiles: dicomFiles.slice(0, 10), // Limit for demo
+        dicomFiles: dicomFiles, // Minimal set for fast loading
         reportFile: report.pdf_enabled === 'True' ? `/data/REPORTS/${report.accession_number}.pdf` : undefined,
-        seriesCount: 1, // Default
-        imageCount: Math.floor(Math.random() * 100) + 20, // Estimate
+        seriesCount: 1, // Simplified
+        imageCount: imageCount,
         dicomEnabled: report.dicom_enabled === 'True',
         pdfEnabled: report.pdf_enabled === 'True',
       }
@@ -168,8 +182,13 @@ export class AGFADataParser {
           description: "MRI + MRA + MRV BRAIN",
           type: "MRI",
           modality: "MR",
-          dicomFiles: ["/data/DICOM/209691018/series1/image001.dcm", "/data/DICOM/209691018/series1/image002.dcm"],
-          reportFile: "/data/REPORTS/209691018_report.pdf",
+          dicomFiles: [
+            "/data/DICOM/00000001/", "/data/DICOM/00000002/", "/data/DICOM/00000003/", 
+            "/data/DICOM/00000004/", "/data/DICOM/00000005/", "/data/DICOM/00000006/",
+            "/data/DICOM/00000007/", "/data/DICOM/00000008/", "/data/DICOM/00000009/",
+            "/data/DICOM/00000010/"
+          ],
+          reportFile: "/data/REPORTS/209691018.pdf",
           seriesCount: 3,
           imageCount: 156,
         },
@@ -179,8 +198,12 @@ export class AGFADataParser {
           description: "MRI BRAIN C-/+",
           type: "MRI",
           modality: "MR",
-          dicomFiles: ["/data/DICOM/209707743/series1/image001.dcm"],
-          reportFile: "/data/REPORTS/209707743_report.pdf",
+          dicomFiles: [
+            "/data/DICOM/00000051/", "/data/DICOM/00000052/", "/data/DICOM/00000053/",
+            "/data/DICOM/00000054/", "/data/DICOM/00000055/", "/data/DICOM/00000056/",
+            "/data/DICOM/00000057/", "/data/DICOM/00000058/", "/data/DICOM/00000059/"
+          ],
+          reportFile: "/data/REPORTS/209707743.pdf",
           seriesCount: 2,
           imageCount: 89,
         },
@@ -190,19 +213,25 @@ export class AGFADataParser {
           description: "MRI BRAIN C-",
           type: "MRI",
           modality: "MR",
-          dicomFiles: ["/data/DICOM/213636532/series1/image001.dcm"],
-          reportFile: "/data/REPORTS/213636532_report.pdf",
+          dicomFiles: [
+            "/data/DICOM/00000101/", "/data/DICOM/00000102/", "/data/DICOM/00000103/",
+            "/data/DICOM/00000104/", "/data/DICOM/00000105/", "/data/DICOM/00000106/"
+          ],
+          reportFile: "/data/REPORTS/213636532.pdf",
           seriesCount: 1,
           imageCount: 45,
         },
         {
           accession: "213637042",
           date: "19/07/2025",
-          description: "Ultrasound Doppler Carotid & Vertebral",
+          description: "ULTRASOUND DOPPLER OF CAROTID & VERTEBRAL ARTERIES",
           type: "Ultrasound",
           modality: "US",
-          dicomFiles: ["/data/DICOM/213637042/series1/image001.dcm"],
-          reportFile: "/data/REPORTS/213637042_report.pdf",
+          dicomFiles: [
+            "/data/DICOM/00000151/", "/data/DICOM/00000152/", "/data/DICOM/00000153/",
+            "/data/DICOM/00000154/"
+          ],
+          reportFile: "/data/REPORTS/213637042.pdf",
           seriesCount: 1,
           imageCount: 12,
         },
@@ -212,24 +241,49 @@ export class AGFADataParser {
           description: "MRI BRAIN C-",
           type: "MRI",
           modality: "MR",
-          dicomFiles: ["/data/DICOM/215512035/series1/image001.dcm"],
-          reportFile: "/data/REPORTS/215512035_report.pdf",
+          dicomFiles: [
+            "/data/DICOM/00000201/", "/data/DICOM/00000202/", "/data/DICOM/00000203/",
+            "/data/DICOM/00000204/", "/data/DICOM/00000205/", "/data/DICOM/00000206/",
+            "/data/DICOM/00000207/"
+          ],
+          reportFile: "/data/REPORTS/215512035.pdf",
           seriesCount: 1,
           imageCount: 67,
         },
         {
           accession: "215516692",
           date: "30/08/2025",
-          description: "CT Angio Brain & Neck",
+          description: "CT ANGIO BRAIN & NECK",
           type: "CT",
           modality: "CT",
-          dicomFiles: ["/data/DICOM/215516692/series1/image001.dcm"],
-          reportFile: "/data/REPORTS/215516692_report.pdf",
+          dicomFiles: [
+            "/data/DICOM/00000251/", "/data/DICOM/00000252/", "/data/DICOM/00000253/",
+            "/data/DICOM/00000254/", "/data/DICOM/00000255/", "/data/DICOM/00000256/",
+            "/data/DICOM/00000257/", "/data/DICOM/00000258/", "/data/DICOM/00000259/",
+            "/data/DICOM/00000260/"
+          ],
+          reportFile: "/data/REPORTS/215516692.pdf",
           seriesCount: 2,
           imageCount: 234,
         },
       ],
     }
+  }
+
+  // Generate DICOM files for a specific study on-demand (lazy loading)
+  static generateDicomFilesForStudy(studyIndex: number, count: number = 5): string[] {
+    const dicomFiles: string[] = []
+    const startFile = (studyIndex * 50) + 1 // Each study gets 50 files range
+    
+    for (let i = 0; i < Math.min(count, 50); i++) {
+      const fileNum = (startFile + i).toString().padStart(8, '0')
+      // Ensure we don't exceed available files (6957 total)
+      if (startFile + i <= 6957) {
+        dicomFiles.push(`/data/DICOM/${fileNum}/`)
+      }
+    }
+    
+    return dicomFiles
   }
 }
 
@@ -251,25 +305,44 @@ function parseAGFAJavaScript(content: string): AGFARawData {
   }
 }
 
-// Load actual AGFA medical data
+// Load actual AGFA medical data with timeout and optimization
 export async function loadMedicalData(): Promise<MedicalData> {
   try {
     console.log("Loading AGFA medical data from /data/data.json")
     
-    const response = await fetch('/data/data.json')
+    // Add timeout to prevent hanging
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), 5000) // 5 second timeout
+    
+    const response = await fetch('/data/data.json', {
+      signal: controller.signal,
+      cache: 'force-cache' // Cache the response
+    })
+    
+    clearTimeout(timeoutId)
+    
     if (!response.ok) {
       throw new Error(`Failed to fetch data: ${response.statusText}`)
     }
     
     const content = await response.text()
+    console.log("Data file loaded, parsing...")
+    
     const rawData = parseAGFAJavaScript(content)
+    console.log("Raw data parsed, processing studies...")
     
-    console.log("Parsed AGFA raw data:", rawData)
+    const medicalData = AGFADataParser.parseRawAGFAData(rawData)
+    console.log(`Successfully loaded ${medicalData.studies.length} studies for ${medicalData.patient.name}`)
     
-    return AGFADataParser.parseRawAGFAData(rawData)
-  } catch (error) {
+    return medicalData
+  } catch (error: any) {
     console.error("Failed to load AGFA medical data:", error)
-    console.log("Falling back to mock data")
+    
+    if (error?.name === 'AbortError') {
+      console.log("Data loading timed out, falling back to mock data")
+    } else {
+      console.log("Data loading failed, falling back to mock data")
+    }
     
     // Fallback to mock data that matches real data structure
     return AGFADataParser.getMockData()
