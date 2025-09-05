@@ -34,22 +34,44 @@ export class AGFAParser {
   static parseIndexContent(content: string): AGFAStudyData[] {
     const studies: AGFAStudyData[] = []
     
-    // Extract study blocks
-    const studyRegex = /<div id="(\d+)" class="menu-item alpha"><h4>([^<]+)<\/h4><p[^>]*>Study (\d+) of ([^<]+)<\/p><ul>(.*?)<\/ul><\/div>/gs
+    // Split content by study divs and process each
+    const studyDivs = content.split('<div id="').filter(div => div.includes('class="menu-item alpha"'))
     
-    let match
-    while ((match = studyRegex.exec(content)) !== null) {
-      const [, accession, title, , date, seriesContent] = match
-      
-      // Parse series within this study
-      const series = this.parseSeriesContent(seriesContent, accession)
-      
-      studies.push({
-        accession,
-        title: title.trim(),
-        date: date.trim(),
-        series
-      })
+    for (const div of studyDivs) {
+      try {
+        // Extract accession number
+        const accessionMatch = div.match(/^(\d+)"/)
+        if (!accessionMatch) continue
+        const accession = accessionMatch[1]
+        
+        // Extract title
+        const titleMatch = div.match(/<h4>([^<]+)<\/h4>/)
+        if (!titleMatch) continue
+        const title = titleMatch[1].trim()
+        
+        // Extract date
+        const dateMatch = div.match(/Study \d+ of ([^<]+)<\/p>/)
+        if (!dateMatch) continue
+        const date = dateMatch[1].trim()
+        
+        // Extract series content
+        const ulMatch = div.match(/<ul>(.*?)<\/ul>/)
+        if (!ulMatch) continue
+        const seriesContent = ulMatch[1]
+        
+        // Parse series within this study
+        const series = this.parseSeriesContent(seriesContent, accession)
+        
+        studies.push({
+          accession,
+          title,
+          date,
+          series
+        })
+      } catch (err) {
+        console.warn("Error parsing study div:", err)
+        continue
+      }
     }
     
     return studies
@@ -75,7 +97,7 @@ export class AGFAParser {
         series.push({
           htmlFile: htmlFile + '.htm',
           seriesNumber: parseInt(seriesNumber),
-          seriesId: seriesId.trim(),
+          seriesId: seriesId.trim(), // This is the SerNr shown in AGFA viewer (like "904", "203", etc.)
           title: title.trim(),
           imageCount: count,
           thumbnailStart,
@@ -83,6 +105,13 @@ export class AGFAParser {
         })
       }
     }
+    
+    // Sort by series ID number for consistent ordering (matches AGFA viewer)
+    series.sort((a, b) => {
+      const aId = parseInt(a.seriesId) || 0
+      const bId = parseInt(b.seriesId) || 0
+      return bId - aId // Descending order to match AGFA viewer
+    })
     
     return series
   }
@@ -114,11 +143,65 @@ export class AGFAParser {
     return { images, thumbnails }
   }
 
-  // Get series data for a specific study
+  // Get series data for a specific study by reading HTML files directly
   static async getStudySeriesData(studyAccession: string): Promise<AGFASeries[]> {
-    const studies = await this.parseIndexFile()
-    const study = studies.find(s => s.accession === studyAccession)
-    return study ? study.series : []
+    try {
+      // First get the study range from INDEX.HTM
+      const studies = await this.parseIndexFile()
+      const study = studies.find(s => s.accession === studyAccession)
+      
+      if (!study || study.series.length === 0) {
+        console.log(`No series found in INDEX.HTM for study ${studyAccession}`)
+        return []
+      }
+
+      // Now read each HTML file to get the exact SerNr from the title
+      const seriesWithCorrectSerNr: AGFASeries[] = []
+      
+      for (const series of study.series) {
+        try {
+          // Read the HTML file to get the real SerNr from title
+          const response = await fetch(`/data/IHE_PDI/${series.htmlFile}`)
+          const htmlContent = await response.text()
+          
+          // Extract SerNr and title from HTML title tag
+          const titleMatch = htmlContent.match(/<title>(\d+)\s+([^<]+)<\/title>/)
+          if (titleMatch) {
+            const [, serNr, seriesTitle] = titleMatch
+            
+            seriesWithCorrectSerNr.push({
+              ...series,
+              seriesId: serNr, // Use the real SerNr from HTML title
+              title: seriesTitle.trim()
+            })
+          } else {
+            // Fallback to original data
+            seriesWithCorrectSerNr.push(series)
+          }
+        } catch (err) {
+          console.warn(`Failed to read HTML file ${series.htmlFile}:`, err)
+          // Use original series data as fallback
+          seriesWithCorrectSerNr.push(series)
+        }
+      }
+
+      // Sort by SerNr in descending order to match AGFA viewer
+      seriesWithCorrectSerNr.sort((a, b) => {
+        const aSerNr = parseInt(a.seriesId) || 0
+        const bSerNr = parseInt(b.seriesId) || 0
+        return bSerNr - aSerNr
+      })
+
+      console.log(`Loaded ${seriesWithCorrectSerNr.length} series for study ${studyAccession}:`)
+      seriesWithCorrectSerNr.forEach(s => {
+        console.log(`  SerNr: ${s.seriesId} - ${s.title} (${s.imageCount} images)`)
+      })
+
+      return seriesWithCorrectSerNr
+    } catch (err) {
+      console.error("Error getting study series data:", err)
+      return []
+    }
   }
 
   // Get all available studies

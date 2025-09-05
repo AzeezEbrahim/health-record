@@ -44,144 +44,76 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
   const [playSpeed, setPlaySpeed] = useState(500) // ms between frames
   const [error, setError] = useState<string | null>(null)
 
-  // Generate series data based on study
+  // Load series data from AGFA parser
   useEffect(() => {
     if (!study) {
       setSeries([])
       return
     }
 
-    setIsLoading(true)
-    setError(null)
+    const loadSeriesData = async () => {
+      setIsLoading(true)
+      setError(null)
 
-    try {
-      // Generate series based on study accession
-      const seriesData: AGFASeries[] = []
-      
-      // Map study accession to series ranges (based on the INDEX.HTM structure)
-      const studySeriesMap: Record<string, { start: number, count: number, seriesInfo: Array<{title: string, imageCount: number}> }> = {
-        "209691018": {
-          start: 11,
-          count: 32,
-          seriesInfo: [
-            { title: "dADC", imageCount: 25 },
-            { title: "sB0", imageCount: 25 },
-            { title: "sB1000", imageCount: 25 },
-            { title: "AX-T2W_TSE_ComforTone", imageCount: 25 },
-            { title: "s3D_PCA_SINUS SENSE", imageCount: 320 },
-            { title: "MRV", imageCount: 35 },
-            { title: "MRA", imageCount: 20 },
-            { title: "SWI", imageCount: 100 },
-            { title: "3D FLAIR", imageCount: 300 },
-            { title: "T2W_3D_DRIVE", imageCount: 48 },
-          ]
-        },
-        "209707743": {
-          start: 52,
-          count: 32,
-          seriesInfo: [
-            { title: "sB0", imageCount: 35 },
-            { title: "sB1000", imageCount: 35 },
-            { title: "dADC map", imageCount: 35 },
-            { title: "T2W_TSE PSS", imageCount: 25 },
-            { title: "SWI", imageCount: 100 },
-            { title: "T2W_FFE", imageCount: 25 },
-            { title: "FLAIR_longTR_SPIR", imageCount: 25 },
-            { title: "sAX-3D_T1W", imageCount: 107 },
-          ]
-        },
-        "213636532": {
-          start: 86,
-          count: 25,
-          seriesInfo: [
-            { title: "sB0", imageCount: 35 },
-            { title: "sB1000", imageCount: 35 },
-            { title: "dADC map", imageCount: 35 },
-            { title: "T2W_TSE PSS", imageCount: 25 },
-            { title: "T2W_FFE", imageCount: 25 },
-            { title: "FLAIR_longTR_SPIR", imageCount: 25 },
-            { title: "3D_Brain_VIEW_FLAIR_1nsa", imageCount: 250 },
-          ]
-        },
-        "213637042": {
-          start: 109,
-          count: 3,
-          seriesInfo: [
-            { title: "ULTRASOUND DOPPLER OF CAROTID & VERTEBRAL ARTERIES", imageCount: 11 },
-          ]
-        },
-        "215512035": {
-          start: 116,
-          count: 27,
-          seriesInfo: [
-            { title: "sB0", imageCount: 35 },
-            { title: "sB1000", imageCount: 35 },
-            { title: "dADC map", imageCount: 35 },
-            { title: "T2W_TSE PSS", imageCount: 25 },
-            { title: "3D_Brain_VIEW_FLAIR_1nsa", imageCount: 250 },
-          ]
-        },
-        "215516692": {
-          start: 139,
-          count: 9,
-          seriesInfo: [
-            { title: "Surview", imageCount: 2 },
-            { title: "STD 2mm", imageCount: 87 },
-            { title: "NECK C-", imageCount: 143 },
-            { title: "Brain Perfusion", imageCount: 544 },
-            { title: "CTA 2mm", imageCount: 188 },
-            { title: "AX MIP", imageCount: 188 },
-            { title: "COR MIP", imageCount: 45 },
-            { title: "SAG MIP", imageCount: 37 },
-            { title: "CTV 2mm", imageCount: 185 },
-          ]
-        }
-      }
-
-      const studyInfo = studySeriesMap[study.accession]
-      if (!studyInfo) {
-        setError("No image data available for this study")
-        setIsLoading(false)
-        return
-      }
-
-      // Generate series for the first few available series (limit for performance)
-      const maxSeries = Math.min(studyInfo.seriesInfo.length, 5) // Limit to 5 series for performance
-      
-      for (let i = 0; i < maxSeries; i++) {
-        const seriesInfo = studyInfo.seriesInfo[i]
-        const seriesId = (studyInfo.start + i).toString().padStart(8, '0')
+      try {
+        console.log(`Loading AGFA series data for study: ${study.accession}`)
         
-        const images: string[] = []
-        const thumbnails: string[] = []
+        // Use the AGFA parser to get correct series data
+        const agfaSeries = await AGFAParser.getStudySeriesData(study.accession)
         
-        // Generate image paths (limit to first 20 images per series for performance)
-        const imageLimit = Math.min(seriesInfo.imageCount, 20)
-        
-        for (let j = 1; j <= imageLimit; j++) {
-          const imageId = (parseInt(seriesId) + j - 1).toString().padStart(8, '0')
-          images.push(`/data/IHE_PDI/IMAGES/${imageId}.00001.jpg`)
-          thumbnails.push(`/data/IHE_PDI/THUMBS/${imageId}.00001.jpg`)
+        if (agfaSeries.length === 0) {
+          setError("No image series found for this study")
+          setIsLoading(false)
+          return
         }
 
-        seriesData.push({
-          id: seriesId,
-          title: seriesInfo.title,
-          images,
-          thumbnails,
-          imageCount: seriesInfo.imageCount
+        console.log(`Found ${agfaSeries.length} series for study ${study.accession}`)
+
+        // Convert to our format and generate image URLs
+        const seriesData: AGFASeries[] = []
+        
+        // Load all series (remove artificial limit)
+        const seriesToLoad = agfaSeries
+        
+        for (const agfaSeriesItem of seriesToLoad) {
+          const { images, thumbnails } = AGFAParser.generateImageURLsForSeries(agfaSeriesItem)
+          
+          // Load ALL images for the series (no artificial limit)
+          const limitedImages = images
+          const limitedThumbnails = thumbnails
+          
+          seriesData.push({
+            id: agfaSeriesItem.seriesId,
+            title: agfaSeriesItem.title,
+            images: limitedImages,
+            thumbnails: limitedThumbnails,
+            imageCount: agfaSeriesItem.imageCount
+          })
+        }
+
+        console.log(`Successfully loaded ${seriesData.length} series for study ${study.accession}:`)
+        seriesData.forEach((s, i) => {
+          console.log(`  ${i + 1}. SerNr: ${s.id} - ${s.title} (${s.imageCount} total, showing ${s.images.length})`)
         })
+        
+        // Debug: Log first few image URLs to verify they're correct
+        if (seriesData.length > 0) {
+          console.log("First series sample images:", seriesData[0].images.slice(0, 3))
+          console.log("First series sample thumbnails:", seriesData[0].thumbnails.slice(0, 3))
+        }
+        
+        setSeries(seriesData)
+        setCurrentSeries(0)
+        setCurrentImage(0)
+      } catch (err) {
+        console.error("Error loading AGFA series data:", err)
+        setError("Failed to load image series from AGFA data")
+      } finally {
+        setIsLoading(false)
       }
-
-      setSeries(seriesData)
-      setCurrentSeries(0)
-      setCurrentImage(0)
-    } catch (err) {
-      console.error("Error loading series data:", err)
-      setError("Failed to load image series")
-    } finally {
-      setIsLoading(false)
     }
+
+    loadSeriesData()
   }, [study])
 
   // Auto-play functionality
@@ -361,7 +293,7 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
 
         {/* Series Selector */}
         {series.length > 1 && (
-          <div className="flex gap-1 flex-wrap">
+          <div className="flex gap-1 flex-wrap max-h-20 overflow-y-auto">
             {series.map((s, index) => (
               <Button
                 key={s.id}
@@ -371,9 +303,10 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
                   setCurrentSeries(index)
                   setCurrentImage(0)
                 }}
-                className="h-7 px-2 text-xs"
+                className="h-7 px-2 text-xs whitespace-nowrap"
+                title={`SerNr: ${s.id} - ${s.title} (${s.imageCount} images)`}
               >
-                {s.title}
+                SerNr: {s.id}
               </Button>
             ))}
           </div>
@@ -423,8 +356,9 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
         {/* Image Info Overlay */}
         {currentSeriesData && !isLoading && (
           <div className="absolute bottom-4 left-4 bg-black/70 text-white px-3 py-2 rounded text-sm">
-            <div>{currentSeriesData.title}</div>
+            <div>SerNr: {currentSeriesData.id} {currentSeriesData.title}</div>
             <div>Image {currentImage + 1} of {currentSeriesData.images.length}</div>
+            <div className="text-xs text-gray-300">Total: {currentSeriesData.imageCount} images</div>
             {zoom !== 1 && <div>Zoom: {Math.round(zoom * 100)}%</div>}
           </div>
         )}
