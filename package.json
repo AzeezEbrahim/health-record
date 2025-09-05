@@ -9,7 +9,7 @@
     "lint": "next lint",
     "export": "rm -rf build-output && next build",
     "deploy:vercel": "vercel --prod",
-    "deploy:github": "npm run export && gh-pages -d build-output"
+    "deploy:github": "npm run export && npx gh-pages -d build-output --dotfiles"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
