@@ -1,7 +1,7 @@
 const nextConfig = {
   output: 'export',
   trailingSlash: true,
-  distDir: 'out',
+  distDir: 'build-output',
   
   assetPrefix: process.env.NODE_ENV === 'production' ? process.env.ASSET_PREFIX || '' : '',
   basePath: process.env.NODE_ENV === 'production' ? process.env.BASE_PATH || '' : '',
@@ -46,6 +46,8 @@ const nextConfig = {
   
   compress: true,
   poweredByHeader: false,
+  outputFileTracing: false,
+  generateBuildId: () => 'build-' + Date.now(),
 }
 
 export default nextConfig

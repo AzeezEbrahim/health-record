@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "rm -rf build-output && next build",
     "start": "next start",
     "lint": "next lint",
-    "export": "next build",
+    "export": "rm -rf build-output && next build",
     "deploy:vercel": "vercel --prod",
-    "deploy:github": "npm run export && gh-pages -d out"
+    "deploy:github": "npm run export && gh-pages -d build-output"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
