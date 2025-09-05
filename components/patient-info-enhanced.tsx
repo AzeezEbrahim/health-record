@@ -50,7 +50,7 @@ export function PatientInfoEnhanced({ patient, studies, onEditPatient, className
 
   // Medical conditions removed as requested
 
-  const patientDescription = `${patientAge}-year-old patient with history of hypertension, type 2 diabetes, and hyperlipidemia. Currently undergoing neurological evaluation for suspected cerebrovascular symptoms. Patient is compliant with medications and follows up regularly with primary care physician.`
+  const patientDescription = `${patientAge}-year-old patient with a history of four cerebrovascular accidents (strokes). The first event occurred in 2018 and involved both an infarct and hemorrhage in the left hemisphere, requiring neurosurgical intervention at King Abdulaziz Hospital. The second stroke occurred in April 2025, also affecting the left side of the brain, after which the patient was started on apixaban. The third stroke took place in July 2025, involving the cerebellum and brainstem, and at that time aspirin was added to apixaban. One month later, following a physician's recommendation, apixaban was discontinued; however, within five days, the patient suffered a fourth stroke. Consequently, the patient was switched to dual antiplatelet therapy with Ravixa and aspirin, and apixaban was not resumed.`
 
   return (
     <Card className={`p-3 h-full flex flex-col ${className || ''}`}>
@@ -79,16 +79,17 @@ export function PatientInfoEnhanced({ patient, studies, onEditPatient, className
               <span className="text-xs text-muted-foreground uppercase tracking-wide">Age</span>
               <p className="font-medium text-sm">{patientAge} years</p>
             </div>
-            <div>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">DOB</span>
-              <p className="font-medium text-sm">{patient.dob}</p>
-            </div>
+
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <span className="text-xs text-muted-foreground uppercase tracking-wide">Patient ID</span>
-              <p className="font-medium text-sm">{patient.id}</p>
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Weight</span>
+              <p className="font-medium text-sm">78 kg</p>
+            </div>
+            <div>
+              <span className="text-xs text-muted-foreground uppercase tracking-wide">Height</span>
+              <p className="font-medium text-sm">164 cm</p>
             </div>
             {patient.mrn && (
               <div>
