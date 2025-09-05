@@ -7,7 +7,8 @@ import { Button } from "@/components/ui/button"
 import { 
   User, 
   Pill, 
-  Edit
+  Edit,
+  Phone
 } from "lucide-react"
 import type { Patient, Study } from "@/lib/types"
 
@@ -48,6 +49,14 @@ export function PatientInfoEnhanced({ patient, studies, onEditPatient, className
     { name: "Astatix", dose: "80mg", frequency: "Once daily", indication: "Cholesterol" }
   ]
 
+  // Emergency contacts
+  const emergencyContacts = [
+    {
+      name: "Safwan Hamid Ahmed Ibrahim",
+      number: "+966549246579"
+    }
+  ]
+
   // Medical conditions removed as requested
 
   const patientDescription = `${patientAge}-year-old patient with a history of four cerebrovascular accidents (strokes). The first event occurred in 2018 and involved both an infarct and hemorrhage in the left hemisphere, requiring neurosurgical intervention at King Abdulaziz Hospital. The second stroke occurred in April 2025, also affecting the left side of the brain, after which the patient was started on apixaban. The third stroke took place in July 2025, involving the cerebellum and brainstem, and at that time aspirin was added to apixaban. One month later, following a physician's recommendation, apixaban was discontinued; however, within five days, the patient suffered a fourth stroke. Consequently, the patient was switched to dual antiplatelet therapy with Ravixa and aspirin, and apixaban was not resumed.`
@@ -71,7 +80,7 @@ export function PatientInfoEnhanced({ patient, studies, onEditPatient, className
         <div className="space-y-2">
           <div>
             <span className="text-xs text-muted-foreground uppercase tracking-wide">Name</span>
-            <p className="font-medium text-sm text-pretty">{patient.name}</p>
+            <p className="font-medium text-sm text-pretty">Hamid Ahmed Ibrahim</p>
           </div>
 
           <div className="grid grid-cols-2 gap-2">
@@ -79,7 +88,6 @@ export function PatientInfoEnhanced({ patient, studies, onEditPatient, className
               <span className="text-xs text-muted-foreground uppercase tracking-wide">Age</span>
               <p className="font-medium text-sm">{patientAge} years</p>
             </div>
-
           </div>
 
           <div className="grid grid-cols-2 gap-2">
@@ -102,10 +110,55 @@ export function PatientInfoEnhanced({ patient, studies, onEditPatient, className
 
         <Separator />
 
+        {/* Emergency Contact */}
+        <div>
+          <span className="text-xs text-muted-foreground uppercase tracking-wide mb-2 block">Emergency Contact</span>
+          <div className="space-y-2">
+            {emergencyContacts.map((contact, idx) => (
+              <div key={idx} className="flex items-center gap-2 bg-muted/50 rounded p-1.5">
+                <Phone className="h-3 w-3 text-muted-foreground" />
+                <div className="flex flex-col flex-1">
+                  <span className="text-xs font-medium">{contact.name}</span>
+                  <a 
+                    href={`tel:${contact.number}`}
+                    className="text-xs text-blue-600 hover:text-blue-800 hover:underline transition-colors cursor-pointer"
+                    title="Click to dial"
+                  >
+                    {contact.number}
+                  </a>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <Separator />
+
         {/* Patient Description */}
         <div>
           <span className="text-xs text-muted-foreground uppercase tracking-wide mb-2 block">Clinical Summary</span>
-          <p className="text-xs text-muted-foreground leading-relaxed">{patientDescription}</p>
+          <div className="text-xs text-muted-foreground leading-relaxed space-y-1">
+            <p className="font-medium">66-year-old patient with history of four cerebrovascular accidents (strokes):</p>
+            <ul className="space-y-1 ml-2">
+              <li className="flex items-start">
+                <span className="text-muted-foreground mr-2">•</span>
+                <span><strong>2018:</strong> First stroke - infarct and hemorrhage in left hemisphere, required neurosurgical intervention at King Abdulaziz Hospital</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-muted-foreground mr-2">•</span>
+                <span><strong>April 2025:</strong> Second stroke - left side of brain, started on apixaban</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-muted-foreground mr-2">•</span>
+                <span><strong>July 2025:</strong> Third stroke - cerebellum and brainstem, aspirin added to apixaban</span>
+              </li>
+              <li className="flex items-start">
+                <span className="text-muted-foreground mr-2">•</span>
+                <span><strong>August 2025:</strong> Fourth stroke - occurred 5 days after apixaban discontinuation</span>
+              </li>
+            </ul>
+            <p className="font-medium mt-2">Current treatment: Dual antiplatelet therapy with Ravixa and aspirin (apixaban discontinued)</p>
+          </div>
         </div>
 
         <Separator />
@@ -134,11 +187,7 @@ export function PatientInfoEnhanced({ patient, studies, onEditPatient, className
       </div>
 
       {/* Edit Instructions */}
-      <div className="mt-3 p-2 bg-muted/30 rounded text-xs text-muted-foreground">
-        <p className="font-medium mb-1">📝 To update patient information:</p>
-        <p>Edit the <code>currentMedications</code> array in <code>patient-info-enhanced.tsx</code> (lines 48-55)</p>
-        <p>Edit the <code>patientDescription</code> text (line 59)</p>
-      </div>
+
     </Card>
   )
 }

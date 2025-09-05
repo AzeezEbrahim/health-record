@@ -49,7 +49,7 @@ npm run build
 ## 🔧 Current Status
 
 ### Working Features:
-- ✅ Patient info display (Ibrahim Hamed Ahmed Abdullah)
+- ✅ Patient info display (Hamid Ahmed Ibrahim)
 - ✅ Study browser (6 AGFA studies from April-August 2025)
 - ✅ DICOM viewer integration with DWV
 - ✅ PDF reports accessible for all studies

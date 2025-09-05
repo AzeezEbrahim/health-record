@@ -106,7 +106,9 @@ export function MedicalDashboardNew({ patient, studies, selectedStudy, onStudySe
               </TabsTrigger>
             </TabsList>
             
-            <StudyNavigation />
+            {activeDesktopTab === "viewer" && (
+              <StudyNavigation />
+            )}
           </div>
 
           {/* Medical Viewer Tab */}
@@ -157,15 +159,15 @@ export function MedicalDashboardNew({ patient, studies, selectedStudy, onStudySe
           <TabsList className="grid grid-cols-3 w-full">
             <TabsTrigger value="viewer" className="flex items-center gap-1">
               <ImageIcon className="h-3 w-3" />
-              <span className="hidden sm:inline">Viewer</span>
+              <span>Viewer</span>
             </TabsTrigger>
             <TabsTrigger value="patient" className="flex items-center gap-1">
               <User className="h-3 w-3" />
-              <span className="hidden sm:inline">Patient</span>
+              <span>Patient</span>
             </TabsTrigger>
             <TabsTrigger value="labs" className="flex items-center gap-1">
               <TestTube className="h-3 w-3" />
-              <span className="hidden sm:inline">Labs</span>
+              <span>Labs</span>
             </TabsTrigger>
           </TabsList>
           

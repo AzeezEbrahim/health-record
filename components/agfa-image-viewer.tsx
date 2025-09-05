@@ -200,19 +200,9 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
           <Badge variant="outline" className="text-xs">
             {study.type}
           </Badge>
-          <Badge variant="default" className="text-xs bg-green-600">
-            AGFA Native
-          </Badge>
-          {currentSeriesData && (
-            <Badge variant="secondary" className="text-xs">
-              Series {currentSeries + 1}/{series.length}
-            </Badge>
-          )}
+
         </div>
         <div className="flex items-center gap-1">
-          <Badge variant="secondary" className="text-xs">
-            {series.reduce((total, s) => total + s.images.length, 0)} images
-          </Badge>
           {onFullscreen && (
             <Button variant="outline" size="sm" onClick={onFullscreen} className="h-7 px-2 bg-transparent">
               <Maximize2 className="h-3 w-3" />
@@ -223,8 +213,57 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
 
       {/* Controls */}
       <div className="mb-2 sm:mb-4 space-y-2">
-        <div className="flex items-center gap-1 flex-wrap">
-          {/* Series Navigation */}
+        {/* Primary Controls - Always Visible */}
+        <div className="flex items-center justify-between">
+          {/* Navigation Controls */}
+          <div className="flex items-center gap-1">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToPreviousImage}
+              disabled={!currentSeriesData || currentSeriesData.images.length <= 1}
+              className="h-8 px-3"
+            >
+              <ChevronLeft className="h-3 w-3" />
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={togglePlayback}
+              disabled={!currentSeriesData || currentSeriesData.images.length <= 1}
+              className="h-8 px-3"
+            >
+              {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
+            </Button>
+
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={goToNextImage}
+              disabled={!currentSeriesData || currentSeriesData.images.length <= 1}
+              className="h-8 px-3"
+            >
+              <ChevronRight className="h-3 w-3" />
+            </Button>
+          </div>
+
+          {/* Zoom Controls */}
+          <div className="flex items-center gap-1">
+            <Button variant="outline" size="sm" onClick={handleZoomOut} className="h-8 px-2">
+              <ZoomOut className="h-3 w-3" />
+            </Button>
+            <Button variant="outline" size="sm" onClick={resetZoom} className="h-8 px-3 min-w-[60px]">
+              {Math.round(zoom * 100)}%
+            </Button>
+            <Button variant="outline" size="sm" onClick={handleZoomIn} className="h-8 px-2">
+              <ZoomIn className="h-3 w-3" />
+            </Button>
+          </div>
+        </div>
+
+        {/* Secondary Controls - Desktop Only */}
+        <div className="hidden sm:flex items-center gap-1">
           <Button
             variant="outline"
             size="sm"
@@ -244,71 +283,29 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
           >
             <SkipForward className="h-3 w-3" />
           </Button>
-
-          {/* Image Navigation */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={goToPreviousImage}
-            disabled={!currentSeriesData || currentSeriesData.images.length <= 1}
-            className="h-7 px-2"
-          >
-            <ChevronLeft className="h-3 w-3" />
-          </Button>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={goToNextImage}
-            disabled={!currentSeriesData || currentSeriesData.images.length <= 1}
-            className="h-7 px-2"
-          >
-            <ChevronRight className="h-3 w-3" />
-          </Button>
-
-          {/* Playback Controls */}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={togglePlayback}
-            disabled={!currentSeriesData || currentSeriesData.images.length <= 1}
-            className="h-7 px-2"
-          >
-            {isPlaying ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
-          </Button>
-
-          {/* Zoom Controls */}
-          <Button variant="outline" size="sm" onClick={handleZoomIn} className="h-7 px-2">
-            <ZoomIn className="h-3 w-3" />
-          </Button>
-
-          <Button variant="outline" size="sm" onClick={handleZoomOut} className="h-7 px-2">
-            <ZoomOut className="h-3 w-3" />
-          </Button>
-
-          <Button variant="outline" size="sm" onClick={resetZoom} className="h-7 px-2">
-            {Math.round(zoom * 100)}%
-          </Button>
         </div>
 
         {/* Series Selector */}
         {series.length > 1 && (
-          <div className="flex gap-1 flex-wrap max-h-20 overflow-y-auto">
-            {series.map((s, index) => (
-              <Button
-                key={s.id}
-                variant={index === currentSeries ? "default" : "outline"}
-                size="sm"
-                onClick={() => {
-                  setCurrentSeries(index)
-                  setCurrentImage(0)
-                }}
-                className="h-7 px-2 text-xs whitespace-nowrap"
-                title={`SerNr: ${s.id} - ${s.title} (${s.imageCount} images)`}
-              >
-                {s.title}
-              </Button>
-            ))}
+          <div className="space-y-2">
+
+            <div className="flex gap-1 flex-wrap max-h-24 overflow-y-auto">
+              {series.map((s, index) => (
+                <Button
+                  key={s.id}
+                  variant={index === currentSeries ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => {
+                    setCurrentSeries(index)
+                    setCurrentImage(0)
+                  }}
+                  className="h-8 px-2 text-xs whitespace-nowrap"
+                  title={`SerNr: ${s.id} - ${s.title} (${s.imageCount} images)`}
+                >
+                  {s.title}
+                </Button>
+              ))}
+            </div>
           </div>
         )}
       </div>
@@ -393,7 +390,7 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
       {/* Study Info */}
       <div className="mt-3 text-xs text-muted-foreground">
         <p>{study.description}</p>
-        <p>Study: {study.accession} • Date: {study.date} • {series.length} series available</p>
+        <p>{study.date} </p>
       </div>
     </Card>
   )

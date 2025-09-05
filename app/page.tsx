@@ -75,8 +75,8 @@ export default function MedicalViewer() {
                 <ImageIcon className="h-4 w-4 text-primary-foreground" />
               </div>
               <h1 className="text-lg sm:text-xl font-semibold text-balance">
-                <span className="hidden sm:inline">{medicalData.patient.name} - Health Records</span>
-                <span className="sm:hidden">{medicalData.patient.name}</span>
+                <span className="hidden sm:inline">Hamid's Health Records</span>
+                <span className="sm:hidden">Hamid's Health Records</span>
               </h1>
             </div>
 
@@ -94,14 +94,10 @@ export default function MedicalViewer() {
                 >
                   <ExternalLink className="h-3 w-3" />
                   <span className="hidden sm:inline">Download Advanced AGFA viewer</span>
-                  <span className="sm:hidden">Studies</span>
+                  <span className="sm:hidden">Download AGFA</span>
                 </a>
               </Button>
-              {selectedStudy && (
-                <Badge variant="outline" className="text-xs">
-                  {selectedStudy.type}
-                </Badge>
-              )}
+
             </div>
           </div>
         </div>

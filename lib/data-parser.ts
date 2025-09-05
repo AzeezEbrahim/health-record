@@ -171,7 +171,7 @@ export class AGFADataParser {
   static getMockData(): MedicalData {
     return {
       patient: {
-        name: "Ibrahim Hamed Ahmed Abdullah",
+        name: "IBRAHIM HAMED AHMED ABDULLAH",
         dob: "01/01/1959",
         id: "PATIENT_ID_001",
       },

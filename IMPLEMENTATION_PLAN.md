@@ -132,7 +132,7 @@ agfa-viewer/
     - Cross-browser testing
 
 ## Study Data Overview
-**Patient**: Ibrahim Hamed Ahmed Abdullah (DOB: 01/01/1959)
+**Patient**: Hamid Ahmed Ibrahim (DOB: 01/01/1959)
 **Studies** (6 total):
 1. `209691018` - MRI + MRA + MRV BRAIN (29/04/2025)
 2. `209707743` - MRI BRAIN C-/+ (30/04/2025)
