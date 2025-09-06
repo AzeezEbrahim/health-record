@@ -1,7 +1,10 @@
 const nextConfig = {
-  output: 'export',
-  trailingSlash: true,
-  distDir: 'out',
+  // Only enable export mode for production builds
+  ...(process.env.NODE_ENV === 'production' && {
+    output: 'export',
+    trailingSlash: true,
+    distDir: 'out',
+  }),
   
   assetPrefix: process.env.NODE_ENV === 'production' ? process.env.ASSET_PREFIX || '' : '',
   basePath: process.env.NODE_ENV === 'production' ? process.env.BASE_PATH || '' : '',

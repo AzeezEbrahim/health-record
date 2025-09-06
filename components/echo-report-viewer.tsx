@@ -291,9 +291,7 @@ export function EchoReportViewer({
               Add
             </Button>
           )}
-          <Button variant="outline" size="sm" className="h-7 px-2 bg-transparent">
-            <Download className="h-3 w-3" />
-          </Button>
+
         </div>
       </div>
 

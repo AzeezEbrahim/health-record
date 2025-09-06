@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { MedicalDashboardNew } from "@/components/medical-dashboard"
+import { HydrationBoundary } from "@/components/hydration-boundary"
 import { ImageIcon, Loader2, ExternalLink } from "lucide-react"
 import type { MedicalData, Study } from "@/lib/types"
 import { loadMedicalData } from "@/lib/data-parser"
@@ -17,12 +18,15 @@ export default function MedicalViewer() {
     const loadData = async () => {
       try {
         console.log("Starting medical data loading...")
-        const startTime = Date.now()
+        // Use performance.now() for client-side timing to avoid hydration mismatches
+        const startTime = typeof window !== 'undefined' ? performance.now() : 0
         
         const data = await loadMedicalData()
         
-        const loadTime = Date.now() - startTime
-        console.log(`Medical data loaded in ${loadTime}ms`)
+        if (typeof window !== 'undefined') {
+          const loadTime = performance.now() - startTime
+          console.log(`Medical data loaded in ${loadTime.toFixed(2)}ms`)
+        }
         
         setMedicalData(data)
         setSelectedStudy(data.studies[0] || null)
@@ -104,12 +108,21 @@ export default function MedicalViewer() {
       </header>
 
       <div className="container mx-auto p-2 sm:p-4">
-        <MedicalDashboardNew
-          patient={medicalData.patient}
-          studies={medicalData.studies}
-          selectedStudy={selectedStudy}
-          onStudySelect={setSelectedStudy}
-        />
+        <HydrationBoundary fallback={
+          <div className="flex items-center justify-center p-8">
+            <div className="text-center">
+              <Loader2 className="h-8 w-8 animate-spin mx-auto mb-2" />
+              <p className="text-sm text-muted-foreground">Loading medical dashboard...</p>
+            </div>
+          </div>
+        }>
+          <MedicalDashboardNew
+            patient={medicalData.patient}
+            studies={medicalData.studies}
+            selectedStudy={selectedStudy}
+            onStudySelect={setSelectedStudy}
+          />
+        </HydrationBoundary>
       </div>
     </div>
   )

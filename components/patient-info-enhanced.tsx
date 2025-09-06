@@ -20,8 +20,12 @@ interface PatientInfoProps {
 
 export function PatientInfoEnhanced({ patient, studies, onEditPatient, className }: PatientInfoProps & { className?: string }) {
   
-  // Calculate patient age from DOB
+  // Calculate patient age from DOB - client-side only to avoid hydration mismatches
   const calculateAge = (dob: string) => {
+    if (typeof window === 'undefined') {
+      return '' // Return empty on server-side
+    }
+    
     try {
       const birthDate = new Date(dob.split('/').reverse().join('-'))
       const today = new Date()

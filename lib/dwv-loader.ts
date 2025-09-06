@@ -42,14 +42,16 @@ export class DWVLoader {
         return true
       }
 
-      // Try multiple CDN sources for better reliability
-      const cdnSources = [
-        "https://unpkg.com/dwv@0.33.5/dist/dwv.min.js",
-        "https://cdn.jsdelivr.net/npm/dwv@0.33.5/dist/dwv.min.js",
-        "https://cdnjs.cloudflare.com/ajax/libs/dwv/0.33.5/dwv.min.js"
+      // Try to load from the installed package first, then fall back to CDN
+      const sources = [
+        // First try the installed package
+        "/node_modules/dwv/dist/dwv.min.js",
+        // Then CDN sources as fallback
+        "https://unpkg.com/dwv@0.35.1/dist/dwv.min.js",
+        "https://cdn.jsdelivr.net/npm/dwv@0.35.1/dist/dwv.min.js"
       ]
 
-      for (const src of cdnSources) {
+      for (const src of sources) {
         try {
           console.log(`Attempting to load DWV from: ${src}`)
           const success = await this.loadScript(src)
@@ -64,7 +66,10 @@ export class DWVLoader {
         }
       }
 
-      throw new Error("Failed to load DWV from all CDN sources")
+      // If all sources fail, just mark as failed but don't throw - let AGFA viewer handle it
+      console.warn("Failed to load DWV from all sources, falling back to AGFA viewer")
+      this.isLoaded = false
+      return false
     } catch (error) {
       console.error("DWV loading failed:", error)
       this.isLoaded = false
@@ -93,6 +98,7 @@ export class DWVLoader {
       script.src = src
       script.async = false // Load synchronously to ensure proper initialization
       script.crossOrigin = "anonymous"
+      script.setAttribute("nomodule", "") // Prevent ES module conflicts
       
       const timeout = setTimeout(() => {
         reject(new Error("Script loading timeout"))
