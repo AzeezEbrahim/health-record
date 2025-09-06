@@ -28,6 +28,7 @@ import { AGFAImageViewer } from "@/components/agfa-image-viewer"
 
 export function DicomViewer({ study, className, onFullscreen }: DicomViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null)
+  const [containerId, setContainerId] = useState('')
   const dwvAppRef = useRef<any>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -42,6 +43,11 @@ export function DicomViewer({ study, className, onFullscreen }: DicomViewerProps
   const [loadingProgress, setLoadingProgress] = useState(0)
   const [useFallback, setUseFallback] = useState(false)
   const [useAGFAViewer, setUseAGFAViewer] = useState(true) // Prefer AGFA viewer by default
+
+  // Generate container ID only on client side to avoid hydration mismatches
+  useEffect(() => {
+    setContainerId(`dwv-container-${Math.random().toString(36).substr(2, 9)}`)
+  }, [])
 
   // Load DWV library using robust loader
   useEffect(() => {
@@ -76,7 +82,7 @@ export function DicomViewer({ study, className, onFullscreen }: DicomViewerProps
 
   // Initialize DWV app
   const initializeDWV = useCallback(() => {
-    if (!isDwvLoaded || !containerRef.current || !window.dwv || dwvAppRef.current) return
+    if (!isDwvLoaded || !containerRef.current || !window.dwv || dwvAppRef.current || !containerId) return
 
     try {
       console.log("Initializing DWV app...")
@@ -86,8 +92,7 @@ export function DicomViewer({ study, className, onFullscreen }: DicomViewerProps
         containerRef.current.innerHTML = ''
       }
       
-      // Create unique container ID
-      const containerId = `dwv-container-${Date.now()}`
+      // Set the container ID
       if (containerRef.current) {
         containerRef.current.id = containerId
       }
@@ -180,11 +185,11 @@ export function DicomViewer({ study, className, onFullscreen }: DicomViewerProps
       console.error("Failed to initialize DWV app:", err)
       setError("Failed to initialize DICOM viewer")
     }
-  }, [isDwvLoaded])
+  }, [isDwvLoaded, containerId])
 
   // Initialize DWV when ready
   useEffect(() => {
-    if (isDwvLoaded && containerRef.current) {
+    if (isDwvLoaded && containerRef.current && containerId) {
       initializeDWV()
     }
 
@@ -199,7 +204,7 @@ export function DicomViewer({ study, className, onFullscreen }: DicomViewerProps
         }
       }
     }
-  }, [isDwvLoaded, initializeDWV])
+  }, [isDwvLoaded, initializeDWV, containerId])
 
   // Load DICOM files when study changes
   useEffect(() => {
