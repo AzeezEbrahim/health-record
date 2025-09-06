@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -137,6 +137,41 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
   const currentSeriesData = series[currentSeries]
   const currentImageSrc = currentSeriesData?.images[currentImage]
   const currentThumbnail = currentSeriesData?.thumbnails[currentImage]
+  const viewerRef = useRef<HTMLDivElement>(null)
+
+  // Handle wheel events with native event listener to prevent page scroll
+  useEffect(() => {
+    const viewer = viewerRef.current
+    if (!viewer) return
+
+    const handleWheelEvent = (e: WheelEvent) => {
+      e.preventDefault()
+      e.stopPropagation()
+      
+      if (e.ctrlKey || e.metaKey) {
+        // Ctrl + scroll = zoom
+        const delta = e.deltaY > 0 ? 0.9 : 1.1
+        setZoom(prev => Math.max(0.1, Math.min(5, prev * delta)))
+      } else {
+        // Regular scroll = navigate images
+        if (currentSeriesData && currentSeriesData.images.length > 1) {
+          if (e.deltaY > 0) {
+            // Scroll down = next image
+            setCurrentImage(prev => prev < currentSeriesData.images.length - 1 ? prev + 1 : 0)
+          } else {
+            // Scroll up = previous image
+            setCurrentImage(prev => prev > 0 ? prev - 1 : currentSeriesData.images.length - 1)
+          }
+        }
+      }
+    }
+
+    viewer.addEventListener('wheel', handleWheelEvent, { passive: false })
+    
+    return () => {
+      viewer.removeEventListener('wheel', handleWheelEvent)
+    }
+  }, [currentSeriesData])
 
   const goToPreviousImage = () => {
     if (currentSeriesData) {
@@ -179,6 +214,7 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
   const resetZoom = () => {
     setZoom(1)
   }
+
 
   if (!study) {
     return (
@@ -315,7 +351,7 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
       </div>
 
       {/* Image Viewer */}
-      <div className="relative bg-black rounded-lg flex-1 overflow-hidden min-h-[400px]">
+      <div ref={viewerRef} className="relative bg-black rounded-lg flex-1 overflow-hidden min-h-[400px]">
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center z-10">
             <div className="text-center text-white">
@@ -334,14 +370,14 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
         )}
 
         {currentImageSrc && !isLoading && !error && (
-          <div className="w-full h-full flex items-center justify-center overflow-hidden">
+          <div className="w-full h-full flex items-center justify-center overflow-hidden relative">
             <img
               src={currentImageSrc}
               alt={`${currentSeriesData?.title} - Image ${currentImage + 1}`}
               className="max-w-full max-h-full object-contain transition-transform duration-200"
               style={{ 
                 transform: `scale(${zoom})`,
-                imageRendering: 'pixelated'
+                imageRendering: zoom > 2 ? 'pixelated' : 'auto'
               }}
               onError={(e) => {
                 // Fallback to thumbnail if main image fails
@@ -350,7 +386,16 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
                   target.src = currentThumbnail
                 }
               }}
+              draggable={false}
             />
+            
+            {/* Left/Right Side Indicators */}
+            <div className="absolute top-4 left-4 bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
+              R
+            </div>
+            <div className="absolute top-4 right-4 bg-black/70 text-white px-2 py-1 rounded text-xs font-medium">
+              L
+            </div>
           </div>
         )}
 
@@ -360,13 +405,13 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
             <div>{currentSeriesData.title}</div>
             <div>Image {currentImage + 1} of {currentSeriesData.images.length}</div>
             <div className="text-xs text-gray-300">Total: {currentSeriesData.imageCount} images</div>
-            {zoom !== 1 && <div>Zoom: {Math.round(zoom * 100)}%</div>}
+            {zoom !== 1 && <div className="text-xs mt-1">Zoom: {Math.round(zoom * 100)}%</div>}
           </div>
         )}
 
         {/* Play Speed Control */}
         {isPlaying && (
-          <div className="absolute top-4 right-4 bg-black/70 text-white px-3 py-2 rounded text-sm">
+          <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-2 rounded text-sm">
             <div className="flex items-center gap-2">
               <span>Speed:</span>
               <Button
