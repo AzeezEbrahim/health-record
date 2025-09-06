@@ -69,7 +69,7 @@ export default function MedicalViewer() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" suppressHydrationWarning={true}>
       {/* Header */}
       <header className="border-b bg-card sticky top-0 z-40">
         <div className="container mx-auto px-4 py-3">
