@@ -18,10 +18,12 @@ export interface AGFAStudyData {
   series: AGFASeries[]
 }
 
+const BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH || '';
+
 export class AGFAParser {
   static async parseIndexFile(): Promise<AGFAStudyData[]> {
     try {
-      const response = await fetch('/data/INDEX.HTM')
+      const response = await fetch(`${BASE_PATH}/data/INDEX.HTM`)
       const content = await response.text()
       
       return this.parseIndexContent(content)
@@ -136,8 +138,8 @@ export class AGFAParser {
     // Generate image URLs based on the pattern
     for (let i = 0; i < series.imageCount; i++) {
       const imageNum = (startImageNum + i).toString().padStart(8, '0')
-      images.push(`/data/IHE_PDI/IMAGES/${imageNum}.00001.jpg`)
-      thumbnails.push(`/data/IHE_PDI/THUMBS/${imageNum}.00001.jpg`)
+      images.push(`${BASE_PATH}/data/IHE_PDI/IMAGES/${imageNum}.00001.jpg`)
+      thumbnails.push(`${BASE_PATH}/data/IHE_PDI/THUMBS/${imageNum}.00001.jpg`)
     }
     
     return { images, thumbnails }
@@ -161,7 +163,7 @@ export class AGFAParser {
       for (const series of study.series) {
         try {
           // Read the HTML file to get the real SerNr from title
-          const response = await fetch(`/data/IHE_PDI/${series.htmlFile}`)
+          const response = await fetch(`${BASE_PATH}/data/IHE_PDI/${series.htmlFile}`)
           const htmlContent = await response.text()
           
           // Extract SerNr and title from HTML title tag

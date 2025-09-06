@@ -47,6 +47,8 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
   const [isPlaying, setIsPlaying] = useState(false)
   const [playSpeed, setPlaySpeed] = useState(DEFAULT_PLAY_SPEED) // ms between frames, default for 8 fps
   const [error, setError] = useState<string | null>(null)
+  const lastScrollTime = useRef<number>(0)
+  const scrollTimeout = useRef<NodeJS.Timeout | null>(null)
 
   // Load series data from AGFA parser
   useEffect(() => {
@@ -140,6 +142,7 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
   const viewerRef = useRef<HTMLDivElement>(null)
 
   // Handle wheel events with native event listener to prevent page scroll
+  // Implements one-image-per-scroll throttling for smooth navigation
   useEffect(() => {
     const viewer = viewerRef.current
     if (!viewer) return
@@ -147,29 +150,55 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
     const handleWheelEvent = (e: WheelEvent) => {
       e.preventDefault()
       e.stopPropagation()
-      
+
       if (e.ctrlKey || e.metaKey) {
         // Ctrl + scroll = zoom
         const delta = e.deltaY > 0 ? 0.9 : 1.1
         setZoom(prev => Math.max(0.1, Math.min(5, prev * delta)))
       } else {
-        // Regular scroll = navigate images
+        // Regular scroll = navigate images (one image per scroll event)
         if (currentSeriesData && currentSeriesData.images.length > 1) {
-          if (e.deltaY > 0) {
-            // Scroll down = next image
-            setCurrentImage(prev => prev < currentSeriesData.images.length - 1 ? prev + 1 : 0)
-          } else {
-            // Scroll up = previous image
-            setCurrentImage(prev => prev > 0 ? prev - 1 : currentSeriesData.images.length - 1)
+          const currentTime = Date.now()
+          const timeSinceLastScroll = currentTime - lastScrollTime.current
+
+          // Throttle to ensure one image change per scroll event (minimum 100ms between changes)
+          if (timeSinceLastScroll > 100) {
+            lastScrollTime.current = currentTime
+
+            // Clear any existing timeout
+            if (scrollTimeout.current) {
+              clearTimeout(scrollTimeout.current)
+            }
+
+            // Determine scroll direction and navigate
+            const isScrollDown = e.deltaY > 0
+
+            setCurrentImage(prev => {
+              if (isScrollDown) {
+                // Scroll down = next image
+                return prev < currentSeriesData.images.length - 1 ? prev + 1 : 0
+              } else {
+                // Scroll up = previous image
+                return prev > 0 ? prev - 1 : currentSeriesData.images.length - 1
+              }
+            })
+
+            // Set a timeout to reset scroll tracking after a short delay
+            scrollTimeout.current = setTimeout(() => {
+              lastScrollTime.current = 0
+            }, 200)
           }
         }
       }
     }
 
     viewer.addEventListener('wheel', handleWheelEvent, { passive: false })
-    
+
     return () => {
       viewer.removeEventListener('wheel', handleWheelEvent)
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current)
+      }
     }
   }, [currentSeriesData])
 

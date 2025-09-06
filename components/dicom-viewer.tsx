@@ -227,7 +227,7 @@ export function DicomViewer({ study, className, onFullscreen }: DicomViewerProps
           // Fallback: generate just 2 file paths for testing
           for (let i = 1; i <= 2; i++) {
             const fileNum = i.toString().padStart(8, '0')
-            dicomFiles.push(`/data/DICOM/${fileNum}/`)
+            dicomFiles.push(`/data/DICOM/${fileNum}`)
           }
         }
 

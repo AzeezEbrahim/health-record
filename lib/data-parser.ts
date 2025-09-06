@@ -20,7 +20,7 @@ export class AGFADataParser {
       
       for (let i = 0; i < sampleCount; i++) {
         const fileNum = (startFile + i).toString().padStart(8, '0')
-        dicomFiles.push(`/data/DICOM/${fileNum}/`)
+        dicomFiles.push(`/data/DICOM/${fileNum}`)
       }
 
       // Calculate estimated image count based on modality (for display purposes only)

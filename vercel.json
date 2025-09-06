@@ -1,14 +1,8 @@
 {
-  "buildCommand": "npm run build",
-  "outputDirectory": "out",
   "framework": "nextjs",
-  "functions": {},
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "outputDirectory": ".next",
   "headers": [
     {
       "source": "/data/(.*)",
@@ -16,15 +10,10 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/(.*).dcm",
-      "headers": [
+        },
         {
-          "key": "Content-Type",
-          "value": "application/dicom"
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
         }
       ]
     }

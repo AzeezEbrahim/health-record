@@ -1,0 +1,55 @@
+# Exclude build artifacts but keep Next.js build output
+build-output/
+node_modules/
+
+# Include sample medical data files for demo (exclude most to keep deployment small)
+public/data/DICOM/*
+!public/data/DICOM/00000001
+!public/data/DICOM/00000002
+!public/data/DICOM/00000003
+!public/data/DICOM/00000004
+!public/data/DICOM/00000005
+
+# Include the entire IHE_PDI IMAGES directory (like local development)
+!public/data/IHE_PDI/IMAGES/
+# Exclude everything else in IHE_PDI to keep deployment size small
+public/data/IHE_PDI/*
+
+# Exclude build output versions
+out/data/DICOM/
+out/data/IHE_PDI/
+
+# Exclude other large directories
+public/data/PLUGINS/
+public/data/HELP/
+public/data/JRE/
+public/data/CDViewerMac.app/
+
+# Exclude executable files
+public/data/*.exe
+public/data/*.EXE
+public/data/*.cmd
+public/data/*.CMD
+public/data/*.sh
+public/data/*.SH
+public/data/*.hta
+public/data/*.HTA
+out/data/*.exe
+out/data/*.EXE
+out/data/*.cmd
+out/data/*.CMD
+out/data/*.sh
+out/data/*.SH
+out/data/*.hta
+out/data/*.HTA
+
+# Exclude other unnecessary files
+*.log
+.DS_Store
+Thumbs.db
+
+# Keep only essential files
+!public/data/data.json
+!out/data/data.json
+!public/favicon.ico
+!out/favicon.ico
