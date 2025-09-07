@@ -15,10 +15,12 @@ import {
   Plus,
   Download,
   Heart,
-  Activity
+  Activity,
+  BarChart3
 } from "lucide-react"
 import type { LabResult, EchoReport } from "@/lib/types"
 import { EchoReportViewer } from "@/components/echo-report-viewer"
+import { LabTrendsChart } from "@/components/lab-trends-chart"
 
 interface LabResultsViewerProps {
   labResults: LabResult[]
@@ -554,13 +556,17 @@ export function LabResultsViewer({
       </div>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col min-h-0">
-        <TabsList className="grid grid-cols-3 w-full mb-3 flex-shrink-0">
+        <TabsList className="grid grid-cols-4 w-full mb-3 flex-shrink-0">
           <TabsTrigger value="all" className="flex items-center gap-1">
             <TestTube className="h-3 w-3" />
             All Labs
             <Badge variant="secondary" className="text-xs ml-1">
               {labResults.length || sampleResults.length}
             </Badge>
+          </TabsTrigger>
+          <TabsTrigger value="trends" className="flex items-center gap-1">
+            <BarChart3 className="h-3 w-3" />
+            Trends
           </TabsTrigger>
           <TabsTrigger value="bp" className="flex items-center gap-1">
             <Heart className="h-3 w-3" />
@@ -580,6 +586,13 @@ export function LabResultsViewer({
 
         <TabsContent value="all" className="flex-1 min-h-0 overflow-hidden">
           {renderResults(displayResults, displayDates, labResults.length === 0)}
+        </TabsContent>
+
+        <TabsContent value="trends" className="flex-1 min-h-0 overflow-hidden">
+          <LabTrendsChart 
+            labResults={labResults.length > 0 ? labResults : sampleResults}
+            className="h-full border-0 p-0" 
+          />
         </TabsContent>
 
         <TabsContent value="bp" className="flex-1 min-h-0 overflow-hidden">
