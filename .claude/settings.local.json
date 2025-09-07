@@ -6,7 +6,9 @@
       "mcp__browsermcp__browser_snapshot",
       "mcp__browsermcp__browser_click",
       "Bash(npm run dev:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(curl:*)",
+      "Read(//Users/azeez/Desktop/Azeez/**)"
     ],
     "deny": [],
     "ask": []

@@ -155,15 +155,19 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
         // Ctrl + scroll = zoom
         const delta = e.deltaY > 0 ? 0.9 : 1.1
         setZoom(prev => Math.max(0.1, Math.min(5, prev * delta)))
+        console.log('🔍 SCROLL: Zoom event detected')
       } else {
         // Regular scroll = navigate images (one image per scroll event)
         if (currentSeriesData && currentSeriesData.images.length > 1) {
           const currentTime = Date.now()
           const timeSinceLastScroll = currentTime - lastScrollTime.current
 
+          console.log(`🔍 SCROLL: DeltaY=${e.deltaY}, TimeSinceLast=${timeSinceLastScroll}ms, Throttled=${timeSinceLastScroll <= 100}`)
+
           // Throttle to ensure one image change per scroll event (minimum 100ms between changes)
           if (timeSinceLastScroll > 100) {
             lastScrollTime.current = currentTime
+            console.log('✅ SCROLL: Processing image change')
 
             // Clear any existing timeout
             if (scrollTimeout.current) {
@@ -172,35 +176,41 @@ export function AGFAImageViewer({ study, className, onFullscreen }: AGFAImageVie
 
             // Determine scroll direction and navigate
             const isScrollDown = e.deltaY > 0
+            const direction = isScrollDown ? 'DOWN' : 'UP'
 
-            setCurrentImage(prev => {
-              if (isScrollDown) {
-                // Scroll down = next image
-                return prev < currentSeriesData.images.length - 1 ? prev + 1 : 0
-              } else {
-                // Scroll up = previous image
-                return prev > 0 ? prev - 1 : currentSeriesData.images.length - 1
-              }
-            })
+            const newImageIndex = isScrollDown
+              ? (currentImage < currentSeriesData.images.length - 1 ? currentImage + 1 : 0)
+              : (currentImage > 0 ? currentImage - 1 : currentSeriesData.images.length - 1)
+
+            console.log(`🎯 SCROLL: ${direction} - Image ${currentImage} → ${newImageIndex}`)
+
+            setCurrentImage(newImageIndex)
 
             // Set a timeout to reset scroll tracking after a short delay
             scrollTimeout.current = setTimeout(() => {
               lastScrollTime.current = 0
+              console.log('🔄 SCROLL: Reset scroll tracking')
             }, 200)
+          } else {
+            console.log('⏱️ SCROLL: Throttled - too soon after last scroll')
           }
+        } else {
+          console.log('❌ SCROLL: No series data or insufficient images')
         }
       }
     }
 
     viewer.addEventListener('wheel', handleWheelEvent, { passive: false })
+    console.log('🎧 SCROLL: Event listener attached to viewer')
 
     return () => {
       viewer.removeEventListener('wheel', handleWheelEvent)
       if (scrollTimeout.current) {
         clearTimeout(scrollTimeout.current)
       }
+      console.log('🧹 SCROLL: Event listener removed')
     }
-  }, [currentSeriesData])
+  }, [currentSeriesData, currentImage])
 
   const goToPreviousImage = () => {
     if (currentSeriesData) {

@@ -10,8 +10,19 @@ public/data/DICOM/*
 !public/data/DICOM/00000004
 !public/data/DICOM/00000005
 
-# Allow AGFA IMAGES and THUMBS directories (removing problematic exclusion)
-# public/data/IHE_PDI/* - commented out to allow image files through
+# Include specific AGFA images for deployment
+!public/data/IHE_PDI/IMAGES/00000011.00001.jpg
+!public/data/IHE_PDI/IMAGES/00000012.00001.jpg
+!public/data/IHE_PDI/IMAGES/00000013.00001.jpg
+!public/data/IHE_PDI/IMAGES/00000014.00001.jpg
+!public/data/IHE_PDI/IMAGES/00000015.00001.jpg
+!public/data/IHE_PDI/IMAGES/00000016.00001.jpg
+!public/data/IHE_PDI/IMAGES/00000017.00001.jpg
+!public/data/IHE_PDI/IMAGES/00000018.00001.jpg
+!public/data/IHE_PDI/IMAGES/00000019.00001.jpg
+!public/data/IHE_PDI/IMAGES/00000020.00001.jpg
+# Exclude everything else in IHE_PDI
+public/data/IHE_PDI/*
 
 # Exclude build output versions
 out/data/DICOM/
